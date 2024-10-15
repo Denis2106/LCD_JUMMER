@@ -68,7 +68,6 @@ char* mode_get_sf_list(ModeData* mode, char  delimiter)
     for (int sf=MIN_SF_VALUE; sf<=MAX_SF_VALUE; sf++) {
         if (mode_get_sf_bit(mode, sf)) {
             sf_list_buf[pos++] = '0'+sf;
-            //sf_list_buf[pos++] = ','; 
             sf_list_buf[pos++] = delimiter;
         }
     }
