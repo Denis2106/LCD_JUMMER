@@ -18,3 +18,5 @@ void mode_set_sf_bit(ModeData* mode, int sf, int value);
 char* mode_get_sf_list(ModeData* mode, char  delimiter);
 void mode_update(int idx, char* key, char* value);
 void mode_commit(int idx);
+
+char* modes_get_dropdown_options(bool include_off=false);

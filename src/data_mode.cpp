@@ -3,6 +3,11 @@
 #include "data_mode.h"
 #include "link.h"
 
+#define MODE_STR_SIZE 30
+static char mode_buf[MODE_STR_SIZE];
+static char res_buf[(MODE_STR_SIZE+1)*MAX_MODE_COUNT];
+
+
 static ModeData mode_data[MAX_MODE_COUNT] = {
     {.freq_min=700, .freq_max=750, .sf_bits=0b00001111},
     {.freq_min=710, .freq_max=740, .sf_bits=0b00000011},
@@ -79,9 +84,40 @@ char* mode_get_sf_list(ModeData* mode, char  delimiter)
 }
 
 
+char* modes_get_dropdown_options(bool include_off)
+{
+    // Формирование строки с перечисленим режимов
+    int pos;
+    pos = 0;
+
+    if (include_off) {
+        sprintf(res_buf, "0: Выключено\n");
+        pos = strlen(res_buf);
+        log("Added off mode  str_len=", false);
+        log(pos);
+    }
+
+    for (int i=0; i<mode_count; i++) {        
+        ModeData* mode = mode_get(i);
+
+        // Формирование строки для DropDown
+        sprintf(&(res_buf[pos]), "%d: %.1f-%.1f  SF=", i+1, mode->freq_min, mode->freq_max);
+        pos = strlen(res_buf);
+
+        // Формирование списка SF и копирование в строку результата
+        char* sf_list_buf = mode_get_sf_list(mode, ',');
+        for (int sf_i=0; sf_list_buf[sf_i]; sf_i++)
+            res_buf[pos++] = sf_list_buf[sf_i];
+
+        res_buf[pos++] = '\n';
+        res_buf[pos] = 0;
+    }
+    return res_buf;
+}
+
 #include <stdio.h>
 
-static char tx_cmd_buf[100];
+static char cmd_buf[100];
 
 /**
  * Подтверждение изменений для передачи на подавитель
@@ -89,7 +125,7 @@ static char tx_cmd_buf[100];
 void mode_commit(int idx)
 {
     ModeData* mode = &(mode_data[idx]);
-    sprintf(tx_cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f,sf:%s}", idx, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
-    log(tx_cmd_buf);
-    link_send_cmd(tx_cmd_buf);
+    sprintf(cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f,sf:%s}", idx, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
+    log(cmd_buf);
+    link_send_cmd(cmd_buf);
 }
