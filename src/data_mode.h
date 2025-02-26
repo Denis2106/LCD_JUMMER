@@ -12,6 +12,7 @@ typedef struct {
 
 extern int mode_count;
 
+void mode_clear();
 ModeData* mode_get(int idx);
 int mode_get_sf_bit(ModeData* mode, int sf);
 void mode_set_sf_bit(ModeData* mode, int sf, int value);

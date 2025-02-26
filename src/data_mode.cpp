@@ -17,6 +17,16 @@ int mode_count=3;
 
 #define SF_TO_BIT(sf) (1<<(sf-MIN_SF_VALUE))
 
+void mode_clear()
+{
+    for (int i=0; i<MAX_MODE_COUNT; i++) {
+        mode_data[i].freq_min = 0;
+        mode_data[i].freq_max = 0;
+        mode_data[i].sf_bits = 0;
+    }
+}
+
+
 void mode_set_sf_bit(ModeData* mode, int sf, int value)
 {
     if (value == 0)
@@ -125,7 +135,7 @@ static char cmd_buf[100];
 void mode_commit(int idx)
 {
     ModeData* mode = &(mode_data[idx]);
-    sprintf(cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f,sf:%s}", idx, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
-    log(cmd_buf);
+    sprintf(cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f,sf:%s}", idx+1, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
     link_send_cmd(cmd_buf);
+    //log(cmd_buf);
 }

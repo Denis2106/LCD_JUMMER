@@ -17,6 +17,10 @@ void msg_mode_update(char **keys, char **values, int pairs_count)
     log("msg mode pairs=", pairs_count);
     int mode_idx = atoi(values[0]);
 
+    if (! mode_idx) return;
+
+    mode_idx--;
+
     for (int i=1; i<pairs_count; i++) {
         mode_update(mode_idx, keys[i], values[i]);
     }
@@ -29,7 +33,7 @@ void msg_info(char **keys, char **values, int pairs_count)
 {
     for (int i=0; i<pairs_count; i++) {
         if (strcmp(keys[i], "info") == 0)
-            add_info(values[i]);
+            add_info(values[i], true);
     }
 }
 
