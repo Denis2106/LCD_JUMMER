@@ -4,6 +4,6 @@
 
 #include "ui.h"
 
-extern TFT_eSPI lcd;
+extern TFT_eSPI* lcd;
 extern uint16_t touchX, touchY;
 extern uint16_t calData[5];

@@ -111,13 +111,13 @@ char* modes_get_dropdown_options(bool include_off)
         ModeData* mode = mode_get(i);
 
         // Формирование строки для DropDown
-        sprintf(&(res_buf[pos]), "%d: %.1f-%.1f  SF=", i+1, mode->freq_min, mode->freq_max);
+        sprintf(&(res_buf[pos]), "%d: %.0f-%.0f", i+1, mode->freq_min, mode->freq_max);
         pos = strlen(res_buf);
 
         // Формирование списка SF и копирование в строку результата
-        char* sf_list_buf = mode_get_sf_list(mode, ',');
-        for (int sf_i=0; sf_list_buf[sf_i]; sf_i++)
-            res_buf[pos++] = sf_list_buf[sf_i];
+        //char* sf_list_buf = mode_get_sf_list(mode, ',');
+        //for (int sf_i=0; sf_list_buf[sf_i]; sf_i++)
+        //    res_buf[pos++] = sf_list_buf[sf_i];
 
         res_buf[pos++] = '\n';
         res_buf[pos] = 0;

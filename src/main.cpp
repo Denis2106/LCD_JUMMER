@@ -11,6 +11,7 @@
 #include "data_mode.h"
 #include "tab_info.h"
 
+#pragma message TOUCH_CS
 
 void msg_mode_update(char **keys, char **values, int pairs_count)
 {
@@ -38,55 +39,76 @@ void msg_info(char **keys, char **values, int pairs_count)
 }
 
 
-#define COMMAND_COUNT 2
+void msg_cmd_reset(char **keys, char **values, int pairs_count)
+{
+    mode_clear();
+    tab_modes_load();
+    link_send_cmd("cmd:get_modes");
+}
+
+
+#define COMMAND_COUNT 3
 CMD_ENTRY commands[COMMAND_COUNT] = {
     {"mode", NULL, msg_mode_update},
-    {"info", NULL, msg_info}
+    {"info", NULL, msg_info},
+    {"cmd", "reset", msg_cmd_reset}
 };
 
 
+#ifdef WIN_DEBUG
+#define LINK_BOUD 115200
 class HostLinkPort : public Port {
     public:
+    void init() { }
+    uint8_t read() { return Serial.read(); }
+    bool is_available() { return Serial.available(); }
+    void write(uint8_t data) { Serial.write(data); }
+};
+#else
+#define LINK_BOUD 9600
+class HostLinkPort : public Port {
+    public:
+    void init() { Serial2.begin(LINK_BOUD); }
     uint8_t read() { return Serial2.read(); }
     bool is_available() { return Serial2.available(); }
     void write(uint8_t data) { Serial2.write(data); }
 };
+#endif
+
 
 static HostLinkPort host_link_port = HostLinkPort();
 
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(LINK_BOUD);
   log_init(&Serial);
 
-  lv_init();
-
-  lcd_init();
-
-  ui_init();
-
-  Serial2.begin(9600);
-  //Serial1.begin(9600, SERIAL_8N1, 25, 32);
+  host_link_port.init();
   link_init(&host_link_port, commands, COMMAND_COUNT, false);
 
+  lcd_init();
+  //ui_init();
   //scr_calibrate();
   //lcd.fillScreen(TFT_BLACK);
 
   scr_test();
-  //lv_demo_widgets();
-  Serial.println( "Setup done" );
+
+  log( "Setup done", true);
 }
 
+
 int last_ping_ms;
+
 
 void loop()
 {
     if (millis() - last_ping_ms > 1000) {
         last_ping_ms = millis();
-        char* txt = "ping";
-        Serial2.println(txt);
-        add_info(txt, true);
+
+        //char* txt = "ping";
+        //Serial2.println(txt);
+        //add_info(txt, true);
     
         while (false && host_link_port.is_available()) {
             char buf[2];
@@ -94,7 +116,7 @@ void loop()
             buf[1] = 0;
             log(buf, false);
 
-            add_info(buf);
+            //add_info(buf, false);
         }
 
     }

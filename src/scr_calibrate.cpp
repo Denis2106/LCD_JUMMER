@@ -107,7 +107,7 @@ void touch_calibrate()
   Serial.println("按指示触摸角落");
   lv_timer_handler();
   Serial.println("setTextFont(1)");
-  lcd.calibrateTouch(calData, TFT_MAGENTA, TFT_BLACK, 15);
+  lcd->calibrateTouch(calData, TFT_MAGENTA, TFT_BLACK, 15);
   Serial.println("calibrateTouch(calData, TFT_MAGENTA, TFT_BLACK, 15)");
   Serial.println(); Serial.println();
   Serial.println("//在setup()中使用此校准代码:");
@@ -123,7 +123,7 @@ void touch_calibrate()
   Serial.println(" };");
   Serial.print("  tft.setTouch(calData);");
   Serial.println(); Serial.println();
-  lcd.fillScreen(TFT_BLACK);
+  lcd->fillScreen(TFT_BLACK);
 
 }
 
@@ -180,7 +180,7 @@ void scr_calibrate()
       lv_timer_handler();
       delay(100);
       touch_calibrate();//触摸校准
-      lcd.setTouch( calData );
+      lcd->setTouch( calData );
       lv_scr_load_anim(ui_TOUCH, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
       lv_timer_handler();
       delay(100);
