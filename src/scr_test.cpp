@@ -1,5 +1,4 @@
 #include "scr_test.h"
-#include <lvgl.h>
 
 #include "debug.h"
 #include "styles.h"
@@ -8,16 +7,17 @@
 #include "tab_info.h"
 
 
-lv_obj_t * tabview;
+lv_obj_t* screen;
+lv_obj_t* tabview;
 
 
-void scr_test(void)
+void build_screen(void)
 {
     styles_init();
 
     lv_coord_t tab_h = 35;
 
-    lv_obj_t *screen = lv_obj_create(NULL);
+    screen = lv_obj_create(NULL);
     lv_obj_set_style_text_font(screen, font_normal, 0);
     lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(screen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);

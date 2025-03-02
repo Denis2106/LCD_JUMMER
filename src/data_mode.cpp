@@ -135,7 +135,7 @@ static char cmd_buf[100];
 void mode_commit(int idx)
 {
     ModeData* mode = &(mode_data[idx]);
-    sprintf(cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f,sf:%s}", idx+1, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
+    sprintf(cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f}", idx+1, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
     link_send_cmd(cmd_buf);
     //log(cmd_buf);
 }
