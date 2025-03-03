@@ -126,16 +126,35 @@ char* modes_get_dropdown_options(bool include_off)
 }
 
 #include <stdio.h>
+#include "w_loading.h"
 
-static char cmd_buf[100];
+static char cmd_data[100];
 
 /**
  * Подтверждение изменений для передачи на подавитель
  */
-void mode_commit(int idx)
+bool mode_commit(int idx)
 {
+    dlg("Сохранение", "Идет сохранение ...", 0);
+
     ModeData* mode = &(mode_data[idx]);
-    sprintf(cmd_buf, "{cmd:set_mode,mode:%d,freq_min:%.1f,freq_max:%.1f}", idx+1, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
-    link_send_cmd(cmd_buf);
-    //log(cmd_buf);
+    sprintf(cmd_data, "mode:%d,freq_min:%.1f,freq_max:%.1f", idx+1, mode->freq_min, mode->freq_max, mode_get_sf_list(mode, '|'));
+
+    int tries = 5;
+    while (tries--) {
+        link_send_cmd("set_mode", cmd_data);
+        int reply = link_wait_reply(1000);
+        if (reply == 0) {
+            dlg("Сохранение", "Режим обновлен", DLG_BTN_CLOSE);
+            dlg_set_color(LV_PALETTE_LIGHT_GREEN);
+
+            return true;
+        }
+    }
+
+    log("mode_commit error");
+    dlg("Сохранение", "Ошибка при сохранении", DLG_BTN_CLOSE);
+    dlg_set_color(LV_PALETTE_RED);
+
+    return false;
 }

@@ -215,10 +215,10 @@ void on_mode_save()
     //mode_set_sf_bit(mode, 8, lv_obj_get_state(cb_sf8) & LV_STATE_CHECKED);
     //mode_set_sf_bit(mode, 9, lv_obj_get_state(cb_sf9) & LV_STATE_CHECKED);
 
-    mode_commit(cur_mode_idx);
-
-    tab_modes_load();
-    lv_dropdown_set_selected(dd_mode, cur_mode_idx);
+    if (mode_commit(cur_mode_idx)) {
+        tab_modes_load();
+        lv_dropdown_set_selected(dd_mode, cur_mode_idx);
+    }
 }
 
 

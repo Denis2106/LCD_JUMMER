@@ -39,8 +39,10 @@ void msg_mode_update(char **keys, char **values, int pairs_count)
 void msg_info(char **keys, char **values, int pairs_count)
 {
     for (int i=0; i<pairs_count; i++) {
-        if (strcmp(keys[i], "info") == 0)
+        if (strcmp(keys[i], "info") == 0) {
             add_info(values[i], true);
+            loading_add_info(values[i]);
+        }
     }
 }
 
@@ -49,23 +51,24 @@ void reset()
 {
     mode_clear();
     tab_modes_load();
-    link_send_cmd("{cmd:get_modes}");
+    link_send_cmd("get_modes", NULL);
 }
 
 
 void msg_cmd_reset(char **keys, char **values, int pairs_count)
 {
     loading_end();
-
     reset();
 }
 
 
-#define COMMAND_COUNT 3
+
+#define COMMAND_COUNT 4
 CMD_ENTRY commands[COMMAND_COUNT] = {
     {"mode", NULL, msg_mode_update},
     {"info", NULL, msg_info},
-    {"cmd", "reset", msg_cmd_reset}
+    {"cmd", "reset", msg_cmd_reset},
+    {"cmdres", NULL, msg_cmdres},
 };
 
 
@@ -122,6 +125,16 @@ void setup()
 int last_ping_ms;
 
 
+void wait_loop()
+{
+    link_process_incom();
+    lv_timer_handler();
+    loading_tick(millis());
+
+    delay(5);
+}
+
+
 void loop()
 {
     if (millis() - last_ping_ms > 1000) {
@@ -143,11 +156,5 @@ void loop()
 
     }
 
-    link_process_incom();
-
-    lv_timer_handler();
-
-    loading_tick(millis());
-
-    delay(5);
+    wait_loop();
 }
