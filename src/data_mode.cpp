@@ -3,23 +3,31 @@
 #include "data_mode.h"
 #include "link.h"
 
-#define MODE_STR_SIZE 30
-static char mode_buf[MODE_STR_SIZE];
-static char res_buf[(MODE_STR_SIZE+1)*MAX_MODE_COUNT];
-
-
-static ModeData mode_data[MAX_MODE_COUNT] = {
+static ModeData mode_data[MODES_COUNT] = {
     {.freq_min=700, .freq_max=750, .sf_bits=0b00001111},
     {.freq_min=710, .freq_max=740, .sf_bits=0b00000011},
     {.freq_min=720, .freq_max=730, .sf_bits=0b00001000},
 };
-int mode_count=3;
+
+static char mode_buf[MODE_STR_SIZE];
+
+char btn_modes_map[MODES_COUNT][MODE_STR_SIZE] = {
+    "0+1: ---",
+    "0+2: ---",
+    "1+0: ---",
+    "1+1: ---",
+    "1+2: ---",
+    "2+0: ---",
+    "2+1: ---",
+    "2+2: ---",
+};
+
 
 #define SF_TO_BIT(sf) (1<<(sf-MIN_SF_VALUE))
 
 void mode_clear()
 {
-    for (int i=0; i<MAX_MODE_COUNT; i++) {
+    for (int i=0; i<MODES_COUNT; i++) {
         mode_data[i].freq_min = 0;
         mode_data[i].freq_max = 0;
         mode_data[i].sf_bits = 0;
@@ -44,6 +52,9 @@ int mode_get_sf_bit(ModeData* mode, int sf)
 
 void mode_update(int idx, char* key, char* value)
 {
+    if (idx < 0 || idx >= MODES_COUNT)
+        return;
+
     ModeData* cur_mode = &(mode_data[idx]);
 
     if (strcmp(key, "freq_min")==0)
@@ -94,34 +105,34 @@ char* mode_get_sf_list(ModeData* mode, char  delimiter)
 }
 
 
-char* modes_get_dropdown_options(bool include_off)
+void modes_update_map()
 {
-    // Формирование строки с перечисленим режимов
-    int pos;
-    pos = 0;
-
-    if (include_off) {
-        sprintf(res_buf, "0: Выключено\n");
-        pos = strlen(res_buf);
-        log("Added off mode  str_len=", false);
-        log(pos);
-    }
-
-    for (int i=0; i<mode_count; i++) {        
+    for (int i=0; i<MODES_COUNT; i++) {        
         ModeData* mode = mode_get(i);
+        char *buf = &(btn_modes_map[i][4]);
+        sprintf(buf, "%4.0f-%4.0f", mode->freq_min, mode->freq_max);
+    }
+}
 
-        // Формирование строки для DropDown
-        sprintf(&(res_buf[pos]), "%d: %.0f-%.0f", i+1, mode->freq_min, mode->freq_max);
+
+#define RES_BUF_SIZE ((MODE_STR_SIZE+1)*MODES_COUNT) 
+static char res_buf[RES_BUF_SIZE] = "1/n2/n3/n";
+
+// Формирование строки для DropDown
+char* modes_get_dropdown_options()
+{
+    int pos = 0;
+
+    for (int i=0; i<MODES_COUNT; i++) {        
+        sprintf(&(res_buf[pos]), "%s", btn_modes_map[i]);
         pos = strlen(res_buf);
 
-        // Формирование списка SF и копирование в строку результата
-        //char* sf_list_buf = mode_get_sf_list(mode, ',');
-        //for (int sf_i=0; sf_list_buf[sf_i]; sf_i++)
-        //    res_buf[pos++] = sf_list_buf[sf_i];
+        if (pos >= RES_BUF_SIZE) break;
 
         res_buf[pos++] = '\n';
         res_buf[pos] = 0;
     }
+
     return res_buf;
 }
 

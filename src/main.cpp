@@ -137,6 +137,7 @@ void wait_loop()
 
 void loop()
 {
+    /*
     if (millis() - last_ping_ms > 1000) {
         last_ping_ms = millis();
 
@@ -144,17 +145,8 @@ void loop()
         //Serial2.println(txt);
         //log(txt);
         //add_info(txt, true);
-    
-        while (false && host_link_port.is_available()) {
-            char buf[2];
-            buf[0] = host_link_port.read();
-            buf[1] = 0;
-            log(buf, false);
-
-            //add_info(buf, false);
-        }
-
     }
+    */
 
     wait_loop();
 }

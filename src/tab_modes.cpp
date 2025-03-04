@@ -16,89 +16,12 @@ static lv_obj_t* ta_freq_max;
 static lv_obj_t* load_btn;
 static lv_obj_t* save_btn;
 
-
-//======================================================================
-//   Таблица режимов
-//======================================================================
-/*
-// Элементы таба "Режимы"
-static lv_obj_t* modes_table;
-
-void modes_table_fill(ModeData* mode, int row)
-{
-    lv_table_set_cell_value_fmt(modes_table, row, 0, "%d", row+1);
-    char buf[30];
-    sprintf(buf, "%6.1f - %6.1f", mode->freq_min, mode->freq_max);
-    lv_table_set_cell_value(modes_table, row, 1, buf);
-    lv_table_set_cell_value(modes_table, row, 2, mode_get_sf_list(mode, ','));
-}
-
-
-// Загружает список режимов в modes.Table и mode.DropDown
-void tab_modes_load()
-{
-    // Очистка таблицы режимов
-    lv_table_set_row_cnt(modes_table, 0);
-
-    for (int i=0; i<MAX_MODE_COUNT; i++) {        
-        ModeData* mode = mode_get(i);
-
-        // TODO отображение списка в таблицу
-        modes_table_fill(mode, i);
-
-        if (mode->freq_min) 
-            mode_count = i+1;
-    }
-
-    char* modes_str = modes_get_dropdown_options();
-    lv_dropdown_set_options_static(dd_mode, modes_str);
-}
-
-
-void tab_modes_create(lv_obj_t* parent)
-{
-    lv_obj_clear_flag(parent, LV_OBJ_FLAG_SCROLLABLE);
-
-    lv_obj_t* header = lv_table_create(parent);
-    lv_obj_clear_flag(header, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_width(header, 300);
-    lv_obj_set_height(header, 40);
-    lv_table_set_col_width(header, 0, 70);
-    lv_table_set_col_width(header, 1, 120);
-    lv_table_set_col_width(header, 2, 100);
-    lv_table_set_cell_value(header, 0, 0, "Номер");
-    lv_table_set_cell_value(header, 0, 1, "Частота, МГц");
-    lv_table_set_cell_value(header, 0, 2, "SF");
-
-    modes_table = lv_table_create(parent);
-    lv_obj_set_y(modes_table, 40);
-    lv_obj_set_width(modes_table, 300);
-    lv_obj_set_height(modes_table, 140);
-    lv_obj_add_flag(modes_table, LV_OBJ_FLAG_SCROLLABLE);
-    lv_table_set_col_width(modes_table, 0, 50);
-    lv_table_set_col_width(modes_table, 1, 120);
-    lv_table_set_col_width(modes_table, 2, 120);
-}
-*/
 //======================================================================
 //   Панель кнопок с режимами
 //======================================================================
 
 lv_obj_t* btn_modes;
 
-#define BTN_MODES_COUNT 8
-
-static char btn_modes_map[][18] = {
-    "0+1: ---",
-    "0+2: ---",
-    "1+0: ---",
-    "1+1: ---",
-    "1+2: ---",
-    "2+0: ---",
-    "2+1: ---",
-    "2+2: ---",
-    ""
-};
 
 const char *btn_map[] = {
     &(btn_modes_map[0][0]),
@@ -118,15 +41,11 @@ const char *btn_map[] = {
         
 void tab_modes_load()
 {
-    for (int i=0; i<BTN_MODES_COUNT; i++) {        
-        ModeData* mode = mode_get(i);
-        char *buf = &(btn_modes_map[i][4]);
-        sprintf(buf, "%4.0f-%4.0f", mode->freq_min, mode->freq_max);
-    }
+    modes_update_map();
 
     lv_btnmatrix_set_map(btn_modes, btn_map);
 
-    char* modes_str = modes_get_dropdown_options(false);    
+    char* modes_str = modes_get_dropdown_options();    
     lv_dropdown_set_options_static(dd_mode, modes_str);
 }
 
@@ -162,9 +81,6 @@ void tab_modes_create(lv_obj_t* parent)
 
     lv_btnmatrix_set_map(btn_modes, btn_map);
     lv_obj_add_event_cb(btn_modes, btn_modes_click, LV_EVENT_VALUE_CHANGED, NULL);
-    //lv_btnmatrix_set_btn_ctrl(btn_modes, 0, LV_BTNMATRIX_CTRL_CHECKED);
-
-    //tab_modes_load();
 }
 
 //======================================================================
@@ -331,7 +247,7 @@ void tab_mode_create(lv_obj_t* parent)
     lv_obj_set_grid_cell(ta_freq_max, LV_GRID_ALIGN_STRETCH, 2, 1, LV_GRID_ALIGN_CENTER, 1, 1);
 
   // SF
-  /*
+  /* 
     lv_obj_t * sf_lbl = lv_label_create(parent);
     lv_label_set_text(sf_lbl, "SF");
     lv_obj_set_grid_cell(sf_lbl, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_CENTER, 2, 2);

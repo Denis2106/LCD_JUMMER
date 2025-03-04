@@ -81,7 +81,7 @@ static void slider_event_cb(lv_event_t * e)
 
 void load_modes()
 {
-    char* modes_str = modes_get_dropdown_options(true);
+    char* modes_str = modes_get_dropdown_options();
     lv_dropdown_set_options_static(dd_mode, "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n");
 }
 
@@ -110,7 +110,6 @@ void tab_status_create(lv_obj_t * parent)
 
     dd_mode = lv_dropdown_create(parent);
     lv_obj_set_grid_cell(dd_mode, LV_GRID_ALIGN_STRETCH, 1, 2, LV_GRID_ALIGN_CENTER, 0, 1);
-    //tab_modes_load();
     load_modes();
 
     lv_obj_t * sf_lbl = lv_label_create(parent);
