@@ -52,8 +52,10 @@ int mode_get_sf_bit(ModeData* mode, int sf)
 
 void mode_update(int idx, char* key, char* value)
 {
-    if (idx < 0 || idx >= MODES_COUNT)
+    if (idx < 0 || idx >= MODES_COUNT) {
+        log("Bad mode_idx", idx);
         return;
+    }
 
     ModeData* cur_mode = &(mode_data[idx]);
 

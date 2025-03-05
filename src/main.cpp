@@ -12,7 +12,7 @@
 #include "tab_info.h"
 #include "styles.h"
 
-#define LOADING_REMAIN 32
+#define LOADING_REMAIN 38
 #include "w_loading.h"
 
 #pragma message TOUCH_CS
@@ -21,7 +21,6 @@ void msg_mode_update(char **keys, char **values, int pairs_count)
 {
     loading_end();
 
-    log("msg mode pairs=", pairs_count);
     int mode_idx = atoi(values[0]);
 
     if (! mode_idx) return;
@@ -50,8 +49,9 @@ void msg_info(char **keys, char **values, int pairs_count)
 void reset()
 {
     mode_clear();
-    tab_modes_load();
     link_send_cmd("get_modes", NULL);
+    delay(1000);
+    tab_modes_load();
 }
 
 
@@ -61,13 +61,39 @@ void msg_cmd_reset(char **keys, char **values, int pairs_count)
     reset();
 }
 
+volatile unsigned long last_in_ping_ms;
+
+void msg_cmd_ping(char **keys, char **values, int pairs_count)
+{
+    return;
+    last_in_ping_ms = millis();
+
+    if (loading_is_active())
+        msg_cmd_reset(NULL, NULL, 0);
+    else
+        dlg_close();
+}
 
 
-#define COMMAND_COUNT 4
+void msg_cmd_status(char **keys, char **values, int pairs_count)
+{
+    msg_cmd_ping(keys, values, pairs_count);
+}
+
+
+void loading_tap()
+{
+    msg_cmd_reset(NULL, NULL, 0);
+}
+
+
+#define COMMAND_COUNT 5
 CMD_ENTRY commands[COMMAND_COUNT] = {
     {"mode", NULL, msg_mode_update},
     {"info", NULL, msg_info},
     {"cmd", "reset", msg_cmd_reset},
+//    {"cmd", "ping", msg_cmd_ping},
+    {"cmd", "status", msg_cmd_status},
     {"cmdres", NULL, msg_cmdres},
 };
 
@@ -112,7 +138,7 @@ void setup()
   //lcd.fillScreen(TFT_BLACK);
 
   build_screen();
-  loading_build(screen, &style_title);
+  loading_build(loading_tap);
 
   log("Setup done", true);
   log("LINK_PORT: ", false); 
@@ -120,9 +146,6 @@ void setup()
 
   reset();
 }
-
-
-int last_ping_ms;
 
 
 void wait_loop()
@@ -147,6 +170,13 @@ void loop()
         //add_info(txt, true);
     }
     */
+    //unsigned long lost_time = (millis()-last_in_ping_ms) / 1000;
+    //if (last_in_ping_ms && lost_time > 5 ) { 
+        //char buf[20];
+        //sprintf(buf, "%d сек", lost_time);
+        //dlg("Потеря связи", buf, DLG_BTN_CLOSE);
+    //    log("Link_lost");
+    //}
 
     wait_loop();
 }
